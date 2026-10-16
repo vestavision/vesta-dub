@@ -2,9 +2,11 @@
 
 ## Reporting
 
-Email the maintainer privately. Do not open a public issue that includes an exploit, a session cookie, or a signed YouTube URL.
+Report a vulnerability privately to security@vestavision.io.
 
-The Git author address in this repository is a placeholder until the owner confirms a monitored security contact. There is no bug-bounty program.
+Do not open a public issue that includes an exploit, a session cookie, a signed YouTube URL, or an API key. Give the project a reasonable chance to investigate before you publish the details.
+
+There is no bug-bounty program. This document does not promise a response time.
 
 ## What to include
 

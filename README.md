@@ -2,7 +2,7 @@
 
 Vesta Dub is an independent open-source browser extension by Vesta Vision. On a YouTube watch page that already has captions, it speaks a Turkish dub. Translation and voices run on your computer. It is not made by YouTube or Google, and it is not a live human dub.
 
-Version 0.1.0 is a public beta of that product. The source in the clean repository is prepared for `https://github.com/vestavision/vesta-dub`. The release assets were not published by the session that prepared them, so the download URL below does not work until the owner publishes the `v0.1.0` release. A local test of the installer does not prove that URL is live.
+Version 0.1.0 is the public beta. Install it from the `v0.1.0` release at `https://github.com/vestavision/vesta-dub`.
 
 ## Install
 
@@ -110,6 +110,6 @@ Read `CONTRIBUTING.md`. Version 0.1 does not add diarization, a new voice, conte
 
 ## Licenses
 
-Source code is Apache-2.0 (`LICENSE`). Third-party terms are in `THIRD_PARTY_LICENSES.md` and `NOTICE`.
+Source code is Apache-2.0 (`LICENSE`). Copyright 2026 Vesta Vision. Third-party terms stay with their authors in `THIRD_PARTY_LICENSES.md` and `NOTICE`.
 
-`NOTICE` records an individual copyright line taken from local Git history. That legal owner is not confirmed, and this README does not assign the copyright to a company. Security reports use `SECURITY.md`. A monitored security address has not been confirmed. Do not send secrets to an unconfirmed address.
+Report security issues to security@vestavision.io. The instructions are in `SECURITY.md`.

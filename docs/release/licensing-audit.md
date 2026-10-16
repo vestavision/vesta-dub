@@ -1,6 +1,8 @@
 # Licensing audit for 0.1.0
 
-This is an engineering record, not a legal opinion. The owner has to confirm they have the right to publish the repository and the bundled weights.
+This is an engineering record, not a legal opinion.
+
+On 2026-10-16 the owner named the project copyright holder as Vesta Vision and the security contact as security@vestavision.io. `NOTICE` says `Copyright 2026 Vesta Vision`. Third-party lines in that file were not replaced. The source-code paragraph below records the earlier unconfirmed individual line and is kept as history.
 
 ## Source code
 

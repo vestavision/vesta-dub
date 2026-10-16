@@ -15,7 +15,7 @@ These are product limits. They are not a reason to hide a broken stop button, a 
 - The translation key lasts for one browser session. The user enters it again after a restart.
 - Background playback depends on the browser continuing the YouTube media element. Earlier notes recorded that the normal Brave profile can pause a hidden video. The extension does not force `video.play()`.
 - Service-worker suspension can delay one translation. It does not restart a stopped session.
-- Piper Fahrettin is removed from the product. The local Git history still contains the weight, so this clone must not be pushed as-is.
+- Piper Fahrettin is not in this product and is not in this repository. Do not add the weight.
 
 ## Cosmetic or secondary
 

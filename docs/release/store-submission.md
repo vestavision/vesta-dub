@@ -1,6 +1,6 @@
 # Chrome Web Store submission draft
 
-Nothing in this file was submitted. No developer account was created, no fee was paid, and no listing was published. Store review is a separate human decision. The current decision is **NO-GO**. Piper is out of the package, but its blob is still in Git history. The default translator is local. Cloud Translation is an optional bring-your-own-key path and has not been called with a real key.
+Nothing in this file was submitted. No developer account was created, no fee was paid, and no listing was published. Store review is a separate human decision. Chrome Web Store submission is **not authorized**. Piper is out of the package and out of this repository's Git history. The default translator is local. Cloud Translation is an optional bring-your-own-key path and has not been called with a real key.
 
 Policies checked on 2026-10-16:
 
@@ -12,7 +12,7 @@ Policies checked on 2026-10-16:
 Policy points that need a person, not another code change:
 
 - Whether the owner's Google Cloud project, quota, and privacy-policy URL are ready before any user is asked to paste an API key.
-- The local Git history still contains the withdrawn Piper weight. Do not publish that history, and do not upload a package built from a tree that still has the file. The current package script rejects the file.
+- This repository does not contain the withdrawn Piper weight. Do not upload a package built from a tree that still has the file. The package script rejects the file.
 - The privacy-policy URL must be a real public page before submission. This draft is not hosted.
 - Screenshots must be taken from the real popup. This session did not capture them.
 
@@ -90,7 +90,7 @@ The extension stores your activation choice and voice choice in the browser's ex
 
 Vesta Dub does not sell personal information and does not use caption text for advertising. You can stop dubbing at any time and you can remove the extension, which removes its stored preferences.
 
-Contact: [owner publishes a monitored address before release]
+Contact: security@vestavision.io
 ```
 
 ## Screenshot checklist
@@ -114,7 +114,7 @@ Use 1280x800 or the current store's required size. Check the dashboard. Include 
 
 ## Support contact
 
-Placeholder only: use a monitored mailbox the owner controls. The Git author address is not automatically a support contract. Put the same address in the store form, `SECURITY.md`, and the privacy policy.
+Support and security contact: security@vestavision.io. Use that address in a future store form. This draft does not submit the listing.
 
 ## Remote code and local execution
 

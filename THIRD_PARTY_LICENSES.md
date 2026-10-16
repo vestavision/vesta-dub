@@ -1,6 +1,6 @@
 # Third-party licenses
 
-Vesta Dub source code is Apache-2.0. The pieces below are not. Confirm each one before publication. The audit is `docs/release/licensing-audit.md`.
+Vesta Dub source code is Apache-2.0, copyright 2026 Vesta Vision. The pieces below are not Vesta Vision copyright. The audit is `docs/release/licensing-audit.md`.
 
 | Component | Role | License as published | Redistribution status |
 | --- | --- | --- | --- |
