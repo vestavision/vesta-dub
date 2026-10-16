@@ -41,7 +41,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y shellcheck
           fi
-          shellcheck -s sh install.sh
+          # Ubuntu's package reports SC2317 for the EXIT trap. ShellCheck 0.11
+          # reports that same trap as SC2329, which install.sh already disables.
+          # The v0.1.0 release asset is pinned by SHA-256, so this check ignores
+          # the older code instead of editing install.sh.
+          shellcheck -s sh -e SC2317 install.sh
 
       - name: Package release candidate
         run: npm run package:release
