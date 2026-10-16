@@ -1,6 +1,8 @@
 # Installer acceptance
 
-Measured on 2026-10-16 in the development working tree. The public GitHub download URL was not requested. A passing local fixture does not mean `https://github.com/vestavision/vesta-dub/releases/download/v0.1.0/` is live.
+The table below was measured on 2026-10-16 against a local fixture. Those rows stay as the fixture record.
+
+Later the same day, the published release was downloaded with no GitHub token. `install.sh`, `vesta-dub-0.1.0.zip`, and `vesta-dub-0.1.0.sha256` matched the pins in `docs/release/v0.1.0-publication.md`. The downloaded `install.sh` was run with a temporary data directory and `VESTA_DUB_OPEN_BROWSER=0`. It printed `status: prepared`, left `manifest.json` at version 0.1.0, and found no Piper asset. It did not load the extension into a browser.
 
 ## Commands
 
