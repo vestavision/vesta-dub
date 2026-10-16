@@ -1,0 +1,50 @@
+import {describe,expect,it,vi} from 'vitest';
+import {TTSManager} from '../src/tts/TTSManager';
+import {DubbingScheduler} from '../src/audio/DubbingScheduler';
+import {SpeakerManager} from '../src/speaker/SpeakerManager';
+import type {SynthesisResult,SubtitleCue} from '../src/core/types';
+import {prepareSpeech} from '../src/tts/FillerPreparation';
+describe('P7.1 explicit provider switching',()=>{
+ it('preserves full normalization for EMA concise re-synthesis without changing displayed captions',async()=>{
+  const tts={synthesize:vi.fn(async(_provider:string,_text:string,_options:unknown)=>({audio:new Float32Array([.1,.2]),sampleRate:48000,duration:.1})).mockResolvedValueOnce({audio:new Float32Array([.1,.2]),sampleRate:48000,duration:20})};
+  const audio={createAudioBuffer:vi.fn(async()=>({duration:20,length:2,numberOfChannels:1})),unduckVideo:vi.fn()};
+  const speakers=new SpeakerManager();speakers.assignProvider('speaker-a','ema-lightning');
+  const scheduler=new DubbingScheduler(audio as never,tts as never,speakers);
+  const cue:SubtitleCue={id:'refine',index:0,startTime:0,endTime:2,duration:2,originalText:'100 dollars for AI.',turkishText:'Bu sistemin AI maliyeti 100 dolar olarak hesaplandı.'};
+  vi.spyOn(scheduler['semanticRefiner'],'refine').mockResolvedValue({isModified:true,text:'AI için 100 dolar.',safetyResult:{isValid:true},strategyUsed:'strategy-b',syllablesSaved:3} as never);
+  await scheduler['ensureSynthesized'](cue);
+  expect(tts.synthesize.mock.calls.length).toBe(2);
+  expect(tts.synthesize.mock.calls[1][1]).toBe(prepareSpeech('AI için 100 dolar.',{sourceText:cue.originalText}).spokenText);
+  expect(cue.turkishText).toBe('Bu sistemin AI maliyeti 100 dolar olarak hesaplandı.');
+ });
+ it('invalidates queued jobs and shared results, disposes the old engine, and does not auto-fallback',async()=>{
+  const manager=TTSManager.getInstance();await manager.disposeAll();
+  const antalia=manager.getProvider('antalia'),ema=manager.getProvider('ema-lightning');
+  let resolve!:(r:SynthesisResult)=>void;
+  const old=vi.spyOn(antalia,'synthesize').mockImplementation(()=>new Promise(r=>resolve=r));
+  const dispose=vi.spyOn(antalia,'dispose').mockResolvedValue();
+  const next=vi.spyOn(ema,'synthesize').mockResolvedValue({audio:new Float32Array([.2]),sampleRate:48000,duration:1/48000});
+  const first=manager.synthesize('antalia','first');const shared=manager.synthesize('antalia','first');const queued=manager.synthesize('antalia','queued');
+  const failures=[first,shared,queued].map(p=>expect(p).rejects.toMatchObject({name:'AbortError'}));
+  await vi.waitFor(()=>expect(old).toHaveBeenCalledTimes(1));
+  const switching=manager.releaseUnusedProviders(['ema-lightning']);
+  resolve({audio:new Float32Array([.1]),sampleRate:48000,duration:1/48000});
+  await Promise.all(failures);await switching;expect(old).toHaveBeenCalledTimes(1);expect(dispose).toHaveBeenCalled();
+  expect(manager.hasCached('antalia','first')).toBe(false);
+  await manager.synthesize('ema-lightning','new');expect(next).toHaveBeenCalledTimes(1);
+  next.mockRejectedValueOnce(new Error('EMA failed'));await expect(manager.synthesize('ema-lightning','failure')).rejects.toThrow('EMA failed');
+  expect(old).toHaveBeenCalledTimes(1);vi.restoreAllMocks();await manager.disposeAll();
+ });
+ it('clears old AudioBuffers and ignores late synthesis without marking the new voice failed',async()=>{
+  const audio={unduckVideo:vi.fn(),createAudioBuffer:vi.fn()};let resolve!:(r:SynthesisResult)=>void;
+  const tts={synthesize:vi.fn((_provider:string,_text:string,_options:unknown)=>new Promise<SynthesisResult>(r=>resolve=r))};
+  const speakers=new SpeakerManager(),scheduler=new DubbingScheduler(audio as never,tts as never,speakers);
+  const cue:SubtitleCue={id:'cue',index:0,startTime:1,endTime:4,duration:3,originalText:'Um, hello AI.',turkishText:'Um, merhaba AI.'};
+  scheduler.setCues([cue]);const job=scheduler['ensureSynthesized'](cue);
+  expect(tts.synthesize.mock.calls[0][1]).toBeDefined();
+  const signal=scheduler['synthesisAbort'].signal;speakers.assignProvider('speaker-a','ema-lightning');scheduler.refreshVoice();
+  expect(signal.aborted).toBe(true);resolve({audio:new Float32Array([.1]),sampleRate:48000,duration:.1});
+  expect(await job).toBeNull();expect(scheduler['bufferCache'].size).toBe(0);expect(scheduler['attempted'].has(cue.id)).toBe(false);
+  expect(audio.createAudioBuffer).not.toHaveBeenCalled();expect(cue.turkishText).toBe('Um, merhaba AI.');expect(cue.spokenText).not.toContain('Um');
+ });
+});

@@ -1,0 +1,12 @@
+Antalia-2 Mini
+Copyright PatientDesk AI and the Antalia contributors
+
+The bundled ONNX weights and frontend data are the Antalia-2 Mini release.
+Upstream states that the code, text normaliser, and weights are Apache-2.0,
+and that the voice is synthetic rather than a recording of a real person.
+
+Source: https://huggingface.co/cloud0day3/antalia-mini
+License: https://www.apache.org/licenses/LICENSE-2.0
+
+Vesta Dub bundles these files for local inference. It does not download a
+replacement copy at runtime.

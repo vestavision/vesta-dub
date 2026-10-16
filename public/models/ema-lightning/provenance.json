@@ -1,0 +1,26 @@
+{
+  "modelRevision": "bc08ba02f1a0de2e3b8266a8f21700a1fc298ea5",
+  "sourceRevision": "174f29442e67d73ab15ab9e34412b64affd579cb",
+  "files": [
+    {
+      "file": "sound_stage.onnx",
+      "sizeBytes": 20001912,
+      "sha256": "5ceadb8c8a69d04ec0bf1e7ef17af5a84aeadd58f3c815eab9ca7d5572b88489"
+    },
+    {
+      "file": "decoder.onnx",
+      "sizeBytes": 12468757,
+      "sha256": "81068406edecc4252a2d0f45c617356239801dab25d16d2d63ac86eebd105fa8"
+    },
+    {
+      "file": "text_stage.onnx",
+      "sizeBytes": 4926920,
+      "sha256": "96d6624b4932ac4afef69986910e33e148aae3c39265c7181e2867d2b4187ca1"
+    },
+    {
+      "file": "vocab.json",
+      "sizeBytes": 778,
+      "sha256": "95685d95b8540f7914650596f86306b975f0ca0eda74e5472bb337f0211b0261"
+    }
+  ]
+}

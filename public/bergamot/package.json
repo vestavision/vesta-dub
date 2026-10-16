@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "commonjs",
+  "description": "Keeps the Bergamot worker in CommonJS when Node loads it. The extension loads the same files as a classic worker."
+}

@@ -1,0 +1,20 @@
+node_modules/
+.output/
+.wxt/
+dist/
+*.local
+.DS_Store
+
+# Local browser evidence, profiles, and recordings. Do not publish.
+tests/artifacts/
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Built release packages are reproduced by scripts/package-release.mjs.
+release/*.zip
+release/*.sha256
+release/manifest.txt

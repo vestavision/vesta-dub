@@ -1,0 +1,8 @@
+Bergamot Translator worker files
+Package: @browsermt/bergamot-translator 0.4.9
+License: Mozilla Public License 2.0
+Source: https://github.com/browsermt/bergamot-translator
+Published WASM version string: v0.4.5+4917c11
+
+These are the published worker files. Vesta Dub does not modify them.
+The English-to-Turkish model weights are not in this directory.

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run compile
+
+      - name: Test
+        run: npm test
+
+      - name: Check install.sh
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y shellcheck
+          fi
+          shellcheck -s sh install.sh
+
+      - name: Package release candidate
+        run: npm run package:release
+
+      - name: Upload unpacked build and zip
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: vesta-dub-0.1.0
+          path: |
+            .output/chrome-mv3
+            release/vesta-dub-0.1.0-rc.zip
+            release/vesta-dub-0.1.0-rc.sha256
+            release/vesta-dub-0.1.0.zip
+            release/vesta-dub-0.1.0.sha256
+            release/manifest.txt
+            install.sh
+          if-no-files-found: error

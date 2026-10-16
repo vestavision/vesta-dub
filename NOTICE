@@ -1,0 +1,41 @@
+Vesta Dub
+Copyright 2026 Sami Salih Ibrahimbas
+
+This product includes software licensed under the Apache License 2.0
+and third-party components under their own licenses.
+See THIRD_PARTY_LICENSES.md and docs/release/licensing-audit.md.
+
+The copyright line above is taken from the local Git history. Confirm the
+legal owner before any public release.
+
+Antalia-2 Mini weights
+Copyright PatientDesk AI and the Antalia contributors
+Apache License 2.0
+https://huggingface.co/cloud0day3/antalia-mini
+
+EMA Lightning Web ONNX assets
+Copyright fr0stb1rd
+Apache License 2.0
+https://github.com/fr0stb1rd/ema-lightning-web
+https://huggingface.co/fr0stb1rd/ema-lightning-web-onnx
+
+ONNX Runtime Web
+Copyright Microsoft Corporation
+MIT License
+
+Bergamot Translator worker
+@browsermt/bergamot-translator 0.4.9
+Mozilla Public License 2.0
+https://github.com/browsermt/bergamot-translator
+The shipped worker is unmodified. See public/bergamot/NOTICE.
+
+Firefox Translations English-to-Turkish model (tiny, spring 2024)
+Mozilla Public License 2.0
+https://github.com/mozilla/firefox-translations-models
+Downloaded by the extension. Not bundled in the zip.
+
+Piper Fahrettin is not part of this product. The working tree does not ship
+tr_TR-fahrettin-medium. The development clone's older Git history still
+contains that ONNX blob. The public repository is a separate Git root and
+does not inherit those objects. Do not publish the development history.
+Older notes that called the voice CC0 are withdrawn.

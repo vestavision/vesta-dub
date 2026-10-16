@@ -1,0 +1,4 @@
+EMA Lightning Web browser inference, fr0stb1rd, Apache-2.0.
+Source: https://github.com/fr0stb1rd/ema-lightning-web/tree/174f29442e67d73ab15ab9e34412b64affd579cb
+Models: https://huggingface.co/fr0stb1rd/ema-lightning-web-onnx/tree/bc08ba02f1a0de2e3b8266a8f21700a1fc298ea5
+Vesta changes: typed assets, lifecycle/session and tensor cleanup, cancellation checks, options and timings. Frontend/math/seed 42/decoder windows retained from the P7 benchmark. See LICENSE and provenance.json.
