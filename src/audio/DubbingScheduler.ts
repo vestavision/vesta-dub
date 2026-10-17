@@ -1,5 +1,6 @@
 import { TurkishSpeechNormalizer } from "../tts/TurkishSpeechNormalizer";
 import { prepareSpeech } from '../tts/FillerPreparation';
+import { redactTraceDetail } from '../tts/CueQualityTrace';
 import { CaptionSourceCapabilities } from '../subtitles/CaptionSource';
 import { SubtitleCue, DubbingMetrics, CueSyncMetadata, RuntimeStatus } from '../core/types';
 import { AudioContextManager } from './AudioContextManager';
@@ -64,7 +65,7 @@ export class DubbingScheduler {
   setStatusCallback(cb: (status: RuntimeStatus, reason?: string) => void): void { this.onStatus = cb; }
   private status(status: RuntimeStatus, reason?: string): void { this.onStatus?.(status, reason); }
   log(cue: SubtitleCue, stage: string, detail: Record<string, unknown> = {}): void {
-    const event = { nativeRequestId: cue.acquisition?.requestId, correlationId: `${this.currentVideoId}:${cue.id}`, stage, wallMs: Date.now(), videoSec: this.video?.currentTime, activeSources: this.activeSource ? 1 : 0, ...detail };
+    const event = { nativeRequestId: cue.acquisition?.requestId, correlationId: `${this.currentVideoId}:${cue.id}`, stage, wallMs: Date.now(), videoSec: this.video?.currentTime, activeSources: this.activeSource ? 1 : 0, ...redactTraceDetail(detail) };
     this.trace.push(event);
     if (this.trace.length > 500) this.trace.shift();
     console.log('[VestaDub Trace]', JSON.stringify(event));
@@ -574,7 +575,7 @@ export class DubbingScheduler {
       cue.speechPreparation = prep;
       cue.spokenText = prep.spokenText;
       textToSpeak = prep.spokenText;
-      if (prep.removedTokenCount) this.log(cue, 'filler_prepared', { rulesVersion: prep.rulesVersion, tokens: prep.tokens, removedTokenCount: prep.removedTokenCount });
+      if (prep.removedTokenCount || prep.discourseApplied.length) this.log(cue, 'speech_prepared', { rulesVersion: prep.rulesVersion, removedTokenCount: prep.removedTokenCount, discourseRules: prep.discourseApplied.map(item => item.rule) });
       if (prep.omitted) {
         if (generation === this.generation) { this.fillerOmissions.set(cue.id, cue.turkishText); this.attempted.add(cue.id); }
         this.log(cue, 'filler_only_omitted', { sourceStartMs: cue.startTime * 1000, sourceEndMs: cue.endTime * 1000 });

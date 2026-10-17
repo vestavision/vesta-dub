@@ -2,7 +2,7 @@
 
 Vesta Dub is an independent open-source browser extension by Vesta Vision. On a YouTube watch page that already has captions, it speaks a Turkish dub. Translation and voices run on your computer. It is not made by YouTube or Google, and it is not a live human dub.
 
-Version 0.1.0 is the public beta. Install it from the `v0.1.0` release at `https://github.com/vestavision/vesta-dub`.
+Version 0.1.1 is the public beta. Install it from the `v0.1.1` release at `https://github.com/vestavision/vesta-dub`. The earlier `v0.1.0` release remains available.
 
 ## Install
 
@@ -17,16 +17,16 @@ Chrome Web Store is the preferred install once a listing is approved. There is n
 
 You do not need Node.js, npm, or an API key. You do need `curl` and `python3`. The script does not use sudo and does not change browser security settings.
 
-The command below downloads `install.sh` from the `v0.1.0` release asset, not from `main`. The SHA-256 in the command is the pin. Check it against the `v0.1.0` tag before you trust it. The script then checks the zip against a second pin that is inside the script.
+The command below downloads `install.sh` from the `v0.1.1` release asset, not from `main`. The SHA-256 in the command is the pin. Check it against the `v0.1.1` tag before you trust it. The script then checks the zip against a second pin that is inside the script.
 
 ```bash
-dir=$(mktemp -d) && cd "$dir" && curl -fsSL -o install.sh "https://github.com/vestavision/vesta-dub/releases/download/v0.1.0/install.sh" && expected=20eb20a8ce38847cf3ad7a209663577aa9c1558d8c9038aee7e3b8b14e2f5485 && actual=$(if command -v sha256sum >/dev/null 2>&1; then sha256sum install.sh; else shasum -a 256 install.sh; fi | awk '{print $1}') && if [ "$actual" != "$expected" ]; then printf 'error: install.sh checksum mismatch\n' >&2; exit 1; fi && sh install.sh
+dir=$(mktemp -d) && cd "$dir" && curl -fsSL -o install.sh "https://github.com/vestavision/vesta-dub/releases/download/v0.1.1/install.sh" && expected=87fa33ba03e07566a9e3868142ecb42076894c9d7f3540a4c5f983713b0374f7 && actual=$(if command -v sha256sum >/dev/null 2>&1; then sha256sum install.sh; else shasum -a 256 install.sh; fi | awk '{print $1}') && if [ "$actual" != "$expected" ]; then printf 'error: install.sh checksum mismatch\n' >&2; exit 1; fi && sh install.sh
 ```
 
 Read the script before you run it:
 
 ```bash
-dir=$(mktemp -d) && cd "$dir" && curl -fsSL -o install.sh "https://github.com/vestavision/vesta-dub/releases/download/v0.1.0/install.sh" && expected=20eb20a8ce38847cf3ad7a209663577aa9c1558d8c9038aee7e3b8b14e2f5485 && actual=$(if command -v sha256sum >/dev/null 2>&1; then sha256sum install.sh; else shasum -a 256 install.sh; fi | awk '{print $1}') && if [ "$actual" != "$expected" ]; then printf 'error: install.sh checksum mismatch\n' >&2; exit 1; fi && ${EDITOR:-less} install.sh
+dir=$(mktemp -d) && cd "$dir" && curl -fsSL -o install.sh "https://github.com/vestavision/vesta-dub/releases/download/v0.1.1/install.sh" && expected=87fa33ba03e07566a9e3868142ecb42076894c9d7f3540a4c5f983713b0374f7 && actual=$(if command -v sha256sum >/dev/null 2>&1; then sha256sum install.sh; else shasum -a 256 install.sh; fi | awk '{print $1}') && if [ "$actual" != "$expected" ]; then printf 'error: install.sh checksum mismatch\n' >&2; exit 1; fi && ${EDITOR:-less} install.sh
 ```
 
 Run `sh install.sh` only after that review. `status: prepared` means the folder is verified. It does not mean the browser loaded the extension. The script prints the folder and the extensions page. Turn on Developer Mode, choose Load unpacked, and select that folder. The folder contains `manifest.json`.
@@ -35,16 +35,16 @@ Useful flags: `--help`, `--version`, `--dry-run`, `--browser brave`, `--browser 
 
 ### Manual install
 
-1. Download `vesta-dub-0.1.0.zip` and `vesta-dub-0.1.0.sha256` from the `v0.1.0` release.
-2. Check the zip. The SHA-256 is `eb9b06430c475ee5dc8d9ec77b0135b56d155341c4157ac54dee6993139f237a`.
-   `sha256sum -c vesta-dub-0.1.0.sha256` or `shasum -a 256 -c vesta-dub-0.1.0.sha256` from the directory that contains the zip.
+1. Download `vesta-dub-0.1.1.zip` and `vesta-dub-0.1.1.sha256` from the `v0.1.1` release.
+2. Check the zip. The SHA-256 is `4ecb385cd9ec853060641a1037a99a9ba1351b9ec733a4f98c01d5d8e5e0ac44`.
+   `sha256sum -c vesta-dub-0.1.1.sha256` or `shasum -a 256 -c vesta-dub-0.1.1.sha256` from the directory that contains the zip.
 3. Unzip it. The extracted folder must contain `manifest.json` at its top level.
 4. Open `brave://extensions` or `chrome://extensions`.
 5. Turn on Developer Mode.
 6. Choose Load unpacked.
 7. Select the extracted folder.
 
-On macOS the installer uses `~/Library/Application Support/Vesta Dub/extensions/0.1.0`. On Linux it uses `${XDG_DATA_HOME:-~/.local/share}/vesta-dub/extensions/0.1.0`.
+On macOS the installer uses `~/Library/Application Support/Vesta Dub/extensions/0.1.1`. On Linux it uses `${XDG_DATA_HOME:-~/.local/share}/vesta-dub/extensions/0.1.1`.
 
 Details, including what the script refuses to do, are in `docs/release/installer-design.md` and `docs/release/installer-security.md`.
 
@@ -64,8 +64,7 @@ The default translation line in the popup is **Yerel çeviri — Varsayılan**. 
 - A translation model cached on the computer after the first download (about 15.1 MB)
 - Antalia-2 Mini speech, and experimental EMA Lightning
 - Filler-aware text preparation
-- Dubbing that follows the video, including pause, resume, and seek
-- Background playback when the browser itself keeps the video playing
+- Dubbing that follows the video while the watch tab stays in the foreground, including pause, resume, and seek
 - Manual activation by default, with optional automatic modes
 - Optional Google Cloud Translation with your own key
 
@@ -79,6 +78,7 @@ The default translation line in the popup is **Yerel çeviri — Varsayılan**. 
 - Shorts, embeds, the feed, and other websites are not supported.
 - If you select Cloud Translation, Google can reject the key, return HTTP 429, or bill the project after the free monthly credit.
 - An unpacked install does not auto-update.
+- Hiding the watch tab can restart the YouTube playhead. On one isolated Brave run the video jumped from about 43 seconds back to 0, then kept playing while hidden. Five continuous minutes of hidden dubbing without that reset did not pass. The normal Brave profile was not part of that run. Stop still restores the original volume. Details are in `docs/release/known-limitations.md`.
 - The normal-browser YouTube listening pass for this build has not been completed. Unit tests do not replace that listen.
 
 ## Privacy
@@ -100,7 +100,7 @@ npm run compile
 npm run build
 ```
 
-Load `.output/chrome-mv3` while developing. `npm run package:release` writes `release/vesta-dub-0.1.0.zip` from that same output. The zip is gitignored. Reproduce it rather than committing it.
+Load `.output/chrome-mv3` while developing. `npm run package:release` writes `release/vesta-dub-0.1.1.zip` from that same output. The zip is gitignored. Reproduce it rather than committing it.
 
 The development clone that still contains the withdrawn Piper weight in old Git objects is not this public tree. Do not push that clone.
 

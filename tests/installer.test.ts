@@ -8,8 +8,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 const root = path.resolve(import.meta.dirname, '..');
 const script = path.join(root, 'install.sh');
-const realZip = path.join(root, 'release/vesta-dub-0.1.0-rc.zip');
-const pinnedZip = 'eb9b06430c475ee5dc8d9ec77b0135b56d155341c4157ac54dee6993139f237a';
+const realZip = path.join(root, 'release/vesta-dub-0.1.1-rc.zip');
+const pinnedZip = readFileSync(script, 'utf8').match(/EXPECTED_ZIP_SHA256="([0-9a-f]{64})"/)?.[1] ?? '';
 const cleanups: Array<() => void> = [];
 
 afterEach(() => {
@@ -32,7 +32,7 @@ function gitBlobId(bytes: Buffer | string): string {
 }
 
 function manifestFixture(): string {
-  return '{"manifest_version":3,"name":"Vesta Dub","version":"0.1.0"}\n';
+  return '{"manifest_version":3,"name":"Vesta Dub","version":"0.1.1"}\n';
 }
 
 function writeExtensionZip(dir: string, files: Record<string, string>): string {
@@ -43,14 +43,14 @@ function writeExtensionZip(dir: string, files: Record<string, string>): string {
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, body);
   }
-  const zipPath = path.join(dir, 'vesta-dub-0.1.0.zip');
+  const zipPath = path.join(dir, 'vesta-dub-0.1.1.zip');
   const zip = spawnSync('zip', ['-r', '-X', '-q', zipPath, '.'], { cwd: source, encoding: 'utf8' });
   expect(zip.status).toBe(0);
   return zipPath;
 }
 
 function writeRawZip(dir: string, python: string): string {
-  const zipPath = path.join(dir, 'vesta-dub-0.1.0.zip');
+  const zipPath = path.join(dir, 'vesta-dub-0.1.1.zip');
   const writer = path.join(dir, 'write-zip.py');
   writeFileSync(writer, python);
   const run = spawnSync('python3', [writer, zipPath], { encoding: 'utf8' });
@@ -60,10 +60,10 @@ function writeRawZip(dir: string, python: string): string {
 
 function publish(dir: string, zipPath: string, publishedHash?: string): string {
   const hash = publishedHash ?? sha256(readFileSync(zipPath));
-  if (path.basename(zipPath) !== 'vesta-dub-0.1.0.zip' || path.dirname(zipPath) !== dir) {
-    writeFileSync(path.join(dir, 'vesta-dub-0.1.0.zip'), readFileSync(zipPath));
+  if (path.basename(zipPath) !== 'vesta-dub-0.1.1.zip' || path.dirname(zipPath) !== dir) {
+    writeFileSync(path.join(dir, 'vesta-dub-0.1.1.zip'), readFileSync(zipPath));
   }
-  writeFileSync(path.join(dir, 'vesta-dub-0.1.0.sha256'), `${hash}  vesta-dub-0.1.0.zip\n`);
+  writeFileSync(path.join(dir, 'vesta-dub-0.1.1.sha256'), `${hash}  vesta-dub-0.1.1.zip\n`);
   return hash;
 }
 
@@ -148,13 +148,13 @@ describe('vesta dub installer', () => {
     expect(help.stdout).toContain('Load unpacked');
     expect(help.stdout).toContain('does not');
     const version = await run(['--version'], {});
-    expect(version.stdout.trim()).toBe('0.1.0');
+    expect(version.stdout.trim()).toBe('0.1.1');
   });
 
-  it('rejects a version other than 0.1.0 and a release URL it does not trust', async () => {
+  it('rejects a version other than 0.1.1 and a release URL it does not trust', async () => {
     const version = await run([], { VESTA_DUB_VERSION: '0.2.0;rm -rf /' });
     expect(version.status).toBe(2);
-    expect(version.stderr).toContain('only prepares 0.1.0');
+    expect(version.stderr).toContain('only prepares 0.1.1');
     const remote = await run([], { VESTA_DUB_RELEASE_BASE: 'https://evil.example/vesta-dub' });
     expect(remote.status).toBe(2);
     expect(remote.stderr).toContain('refusing release URL');
@@ -211,9 +211,9 @@ describe('vesta dub installer', () => {
     expect(first.stdout).toContain('reused: no');
     expect(first.stdout).toContain('did not load the extension into the browser');
     expect(first.stdout).not.toContain('status: installed');
-    const manifest = JSON.parse(readFileSync(path.join(home, 'extensions/0.1.0/manifest.json'), 'utf8')) as { version: string };
-    expect(manifest.version).toBe('0.1.0');
-    expect(readFileSync(path.join(home, 'extensions/0.1.0.stamp'), 'utf8')).toContain(hash);
+    const manifest = JSON.parse(readFileSync(path.join(home, 'extensions/0.1.1/manifest.json'), 'utf8')) as { version: string };
+    expect(manifest.version).toBe('0.1.1');
+    expect(readFileSync(path.join(home, 'extensions/0.1.1.stamp'), 'utf8')).toContain(hash);
     const hitsAfterFirst = server.hits.n;
 
     const second = await run([], env, home);
@@ -227,7 +227,7 @@ describe('vesta dub installer', () => {
     const newer = await run([], { ...env, VESTA_DUB_RELEASE_BASE: 'http://127.0.0.1:1' }, newerHome);
     expect(newer.status, newer.stderr).toBe(0);
     expect(newer.stdout).toContain('status: kept-newer');
-    expect(existsSync(path.join(newerHome, 'extensions/0.1.0'))).toBe(false);
+    expect(existsSync(path.join(newerHome, 'extensions/0.1.1'))).toBe(false);
   });
 
   it('uses the macOS and Linux user directories', async () => {
@@ -246,7 +246,7 @@ describe('vesta dub installer', () => {
     }, linuxHome);
     expect(linux.status, linux.stderr).toBe(0);
     expect(linux.stdout).toContain('browser: none');
-    expect(existsSync(path.join(linuxHome, '.local/share/vesta-dub/extensions/0.1.0/manifest.json'))).toBe(true);
+    expect(existsSync(path.join(linuxHome, '.local/share/vesta-dub/extensions/0.1.1/manifest.json'))).toBe(true);
 
     const macHome = tempDir('vesta-mac-');
     const mac = await run([], {
@@ -259,14 +259,14 @@ describe('vesta dub installer', () => {
     }, macHome);
     expect(mac.status, mac.stderr).toBe(0);
     expect(mac.stdout).toContain('browser: chrome');
-    expect(existsSync(path.join(macHome, 'Library/Application Support/Vesta Dub/extensions/0.1.0/manifest.json'))).toBe(true);
+    expect(existsSync(path.join(macHome, 'Library/Application Support/Vesta Dub/extensions/0.1.1/manifest.json'))).toBe(true);
   });
 
   it('rejects a bad checksum, a corrupt archive, a short download, and a missing manifest', async () => {
     const release = tempDir('vesta-release-');
     const zip = writeExtensionZip(release, { 'manifest.json': manifestFixture() });
     const hash = sha256(readFileSync(zip));
-    writeFileSync(path.join(release, 'vesta-dub-0.1.0.sha256'), `${'b'.repeat(64)}  vesta-dub-0.1.0.zip\n`);
+    writeFileSync(path.join(release, 'vesta-dub-0.1.1.sha256'), `${'b'.repeat(64)}  vesta-dub-0.1.1.zip\n`);
     const mismatch = await serve(release);
     const browsers = fakeBrowsers(['brave']);
     const wrong = await run([], {
@@ -276,11 +276,11 @@ describe('vesta dub installer', () => {
     });
     expect(wrong.status).toBe(3);
     expect(wrong.stderr).toContain('does not match the pinned SHA-256');
-    expect(existsSync(path.join(wrong.home, 'extensions/0.1.0'))).toBe(false);
+    expect(existsSync(path.join(wrong.home, 'extensions/0.1.1'))).toBe(false);
 
     const corruptDir = tempDir('vesta-release-');
-    writeFileSync(path.join(corruptDir, 'vesta-dub-0.1.0.zip'), Buffer.from('this is not a zip'));
-    const corruptHash = publish(corruptDir, path.join(corruptDir, 'vesta-dub-0.1.0.zip'));
+    writeFileSync(path.join(corruptDir, 'vesta-dub-0.1.1.zip'), Buffer.from('this is not a zip'));
+    const corruptHash = publish(corruptDir, path.join(corruptDir, 'vesta-dub-0.1.1.zip'));
     const corruptServer = await serve(corruptDir);
     const corrupt = await run([], {
       VESTA_DUB_RELEASE_BASE: corruptServer.url,
@@ -289,7 +289,7 @@ describe('vesta dub installer', () => {
     });
     expect(corrupt.status).toBe(3);
     expect(corrupt.stderr).toContain('not a zip');
-    expect(existsSync(path.join(corrupt.home, 'extensions/0.1.0'))).toBe(false);
+    expect(existsSync(path.join(corrupt.home, 'extensions/0.1.1'))).toBe(false);
 
     const partialDir = tempDir('vesta-release-');
     const partialHash = publish(partialDir, writeExtensionZip(partialDir, { 'manifest.json': manifestFixture() }));
@@ -300,8 +300,8 @@ describe('vesta dub installer', () => {
       VESTA_DUB_FAKE_BROWSERS: browsers,
     });
     expect(partial.status).toBe(4);
-    expect(existsSync(path.join(partial.home, 'extensions/0.1.0'))).toBe(false);
-    expect(existsSync(path.join(partial.home, 'extensions/0.1.0.partial'))).toBe(false);
+    expect(existsSync(path.join(partial.home, 'extensions/0.1.1'))).toBe(false);
+    expect(existsSync(path.join(partial.home, 'extensions/0.1.1.partial'))).toBe(false);
 
     const offline = await run([], {
       VESTA_DUB_RELEASE_BASE: 'http://127.0.0.1:1',
@@ -332,7 +332,7 @@ zf = zipfile.ZipFile(sys.argv[1], "w")
 zf.writestr("../escaped.txt", b"nope")
 zf.close()
 `);
-    const parentHash = publish(parentDir, path.join(parentDir, 'vesta-dub-0.1.0.zip'));
+    const parentHash = publish(parentDir, path.join(parentDir, 'vesta-dub-0.1.1.zip'));
     const parentServer = await serve(parentDir);
     const parent = await run([], {
       VESTA_DUB_RELEASE_BASE: parentServer.url,
@@ -352,7 +352,7 @@ info.external_attr = (stat.S_IFLNK | 0o777) << 16
 zf.writestr(info, "/tmp/not-a-manifest")
 zf.close()
 `);
-    const linkHash = publish(linkDir, path.join(linkDir, 'vesta-dub-0.1.0.zip'));
+    const linkHash = publish(linkDir, path.join(linkDir, 'vesta-dub-0.1.1.zip'));
     const linkServer = await serve(linkDir);
     const link = await run([], {
       VESTA_DUB_RELEASE_BASE: linkServer.url,
@@ -375,8 +375,8 @@ zf.close()
     });
     expect(piper.status).toBe(3);
     expect(piper.stderr.toLowerCase()).toContain('piper');
-    expect(existsSync(path.join(piper.home, 'extensions/0.1.0'))).toBe(false);
-    expect(existsSync(path.join(piper.home, 'extensions/0.1.0.partial'))).toBe(false);
+    expect(existsSync(path.join(piper.home, 'extensions/0.1.1'))).toBe(false);
+    expect(existsSync(path.join(piper.home, 'extensions/0.1.1.partial'))).toBe(false);
 
     const hashDir = tempDir('vesta-release-');
     const body = 'not-a-model';
@@ -411,8 +411,8 @@ zf.close()
     });
     expect(gitHit.status).toBe(3);
     expect(gitHit.stderr).toContain('withdrawn Piper file');
-    expect(existsSync(path.join(gitHit.home, 'extensions/0.1.0'))).toBe(false);
-    expect(existsSync(path.join(gitHit.home, 'extensions/0.1.0.partial'))).toBe(false);
+    expect(existsSync(path.join(gitHit.home, 'extensions/0.1.1'))).toBe(false);
+    expect(existsSync(path.join(gitHit.home, 'extensions/0.1.1.partial'))).toBe(false);
   });
 
   it('does not replace a directory whose stamp differs', async () => {
@@ -420,9 +420,9 @@ zf.close()
     const hash = publish(release, writeExtensionZip(release, { 'manifest.json': manifestFixture() }));
     const server = await serve(release);
     const home = tempDir('vesta-home-');
-    mkdirSync(path.join(home, 'extensions/0.1.0'), { recursive: true });
-    writeFileSync(path.join(home, 'extensions/0.1.0/manifest.json'), manifestFixture());
-    writeFileSync(path.join(home, 'extensions/0.1.0.stamp'), `0.1.0\n${'c'.repeat(64)}\n`);
+    mkdirSync(path.join(home, 'extensions/0.1.1'), { recursive: true });
+    writeFileSync(path.join(home, 'extensions/0.1.1/manifest.json'), manifestFixture());
+    writeFileSync(path.join(home, 'extensions/0.1.1.stamp'), `0.1.1\n${'c'.repeat(64)}\n`);
     const result = await run([], {
       VESTA_DUB_RELEASE_BASE: server.url,
       VESTA_DUB_EXPECTED_SHA256: hash,
@@ -437,20 +437,20 @@ zf.close()
     const home = tempDir('vesta-home-');
     const elsewhere = tempDir('vesta-elsewhere-');
     mkdirSync(path.join(home, 'extensions'), { recursive: true });
-    symlinkSync(elsewhere, path.join(home, 'extensions/0.1.0'));
+    symlinkSync(elsewhere, path.join(home, 'extensions/0.1.1'));
     const result = await run(['--dry-run'], { VESTA_DUB_FAKE_BROWSERS: fakeBrowsers(['brave']) }, home);
     expect(result.status).toBe(2);
     expect(result.stderr).toContain('symlink');
     expect(existsSync(elsewhere)).toBe(true);
-    expect(existsSync(path.join(home, 'extensions/0.1.0'))).toBe(true);
+    expect(existsSync(path.join(home, 'extensions/0.1.1'))).toBe(true);
   });
 
-  it('prepares the real 0.1.0 archive when the local release zip is present', async () => {
+  it('prepares the real 0.1.1 archive when the local release zip is present', async () => {
     if (!existsSync(realZip)) return;
     expect(sha256(readFileSync(realZip))).toBe(pinnedZip);
     const release = tempDir('vesta-release-');
-    writeFileSync(path.join(release, 'vesta-dub-0.1.0.zip'), readFileSync(realZip));
-    publish(release, path.join(release, 'vesta-dub-0.1.0.zip'), pinnedZip);
+    writeFileSync(path.join(release, 'vesta-dub-0.1.1.zip'), readFileSync(realZip));
+    publish(release, path.join(release, 'vesta-dub-0.1.1.zip'), pinnedZip);
     const server = await serve(release);
     const home = tempDir('vesta-home-');
     const result = await run([], {
@@ -460,11 +460,11 @@ zf.close()
     expect(result.status, result.stderr).toBe(0);
     expect(result.stdout).toContain('status: prepared');
     expect(result.stdout).toContain(pinnedZip);
-    const manifest = JSON.parse(readFileSync(path.join(home, 'extensions/0.1.0/manifest.json'), 'utf8')) as { version: string; manifest_version: number };
-    expect(manifest.version).toBe('0.1.0');
+    const manifest = JSON.parse(readFileSync(path.join(home, 'extensions/0.1.1/manifest.json'), 'utf8')) as { version: string; manifest_version: number };
+    expect(manifest.version).toBe('0.1.1');
     expect(manifest.manifest_version).toBe(3);
-    expect(existsSync(path.join(home, 'extensions/0.1.0/models/piper'))).toBe(false);
-    const names = spawnSync('find', [path.join(home, 'extensions/0.1.0'), '-iname', '*fahrettin*', '-o', '-iname', '*piper*'], { encoding: 'utf8' });
+    expect(existsSync(path.join(home, 'extensions/0.1.1/models/piper'))).toBe(false);
+    const names = spawnSync('find', [path.join(home, 'extensions/0.1.1'), '-iname', '*fahrettin*', '-o', '-iname', '*piper*'], { encoding: 'utf8' });
     expect(names.stdout.trim()).toBe('');
   }, 180_000);
 });

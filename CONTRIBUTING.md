@@ -27,7 +27,7 @@ npm run compile
 npm run build
 ```
 
-Load `.output/chrome-mv3` as an unpacked extension. `npm run package:release` builds that directory and writes `release/vesta-dub-0.1.0-rc.zip` plus a byte-identical `release/vesta-dub-0.1.0.zip`. End users prepare that public zip with `install.sh`. They do not need Node.js. The script does not load the extension into the browser.
+Load `.output/chrome-mv3` as an unpacked extension. `npm run package:release` builds that directory and writes `release/vesta-dub-0.1.1-rc.zip` plus a byte-identical `release/vesta-dub-0.1.1.zip`. End users prepare that public zip with `install.sh`. They do not need Node.js. The script does not load the extension into the browser.
 
 ## Tests
 

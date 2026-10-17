@@ -1,4 +1,5 @@
 import { CaptionParser } from '../src/subtitles/CaptionParser';
+import { captionActivationDecision, shouldRestoreCaptionPlayback } from '../src/subtitles/CaptionActivation';
 import { installMediaProbe, mainWorldHooks, readPauseIsolationFlags } from '../src/diagnostics/PauseIsolation';
 
 export default defineContentScript({
@@ -146,42 +147,153 @@ export default defineContentScript({
       };
     }
 
-    // 3. Handle explicit track requests from extension
+    // 3. Handle explicit track requests from extension.
+    // Selecting a track by language code reloads the media element. Selecting the
+    // track object already published by the player fetches timedtext without that
+    // reload. No request is made while the tab is hidden.
+    let activatedFor: string | null = null;
+    let activationAttempts = 0;
+    let lastActivationAt = 0;
+    let deferredTrack: { videoId: string; languageCode?: string } | null = null;
+    let retryTimer: number | null = null;
+
+    const armPlaybackRestore = (videoId: string, savedTime: number, savedVolume: number | null) => {
+      let restores = 0;
+      let anchor = savedTime;
+      const started = performance.now();
+      const finish = () => {
+        document.removeEventListener('timeupdate', onMedia, true);
+        document.removeEventListener('loadeddata', onMedia, true);
+        document.removeEventListener('play', onMedia, true);
+        document.removeEventListener('pause', onPause, true);
+      };
+      const mainVideo = (event: Event) => {
+        const media = event.target as HTMLMediaElement | null;
+        if (!media || media.nodeName !== 'VIDEO' || !media.classList.contains('html5-main-video')) return null;
+        return media;
+      };
+      const onPause = (event: Event) => {
+        const media = mainVideo(event);
+        if (!media || media.currentTime <= 1) return;
+        anchor = media.currentTime;
+      };
+      const onMedia = (event: Event) => {
+        if (performance.now() - started > 120000) { finish(); return; }
+        if (new URL(location.href).searchParams.get('v') !== videoId) { finish(); return; }
+        const media = mainVideo(event);
+        if (!media) return;
+        if (media.currentTime > 1) { anchor = media.currentTime; return; }
+        if (!shouldRestoreCaptionPlayback(anchor, media.currentTime, restores >= 2)) return;
+        restores += 1;
+        try { media.currentTime = anchor; } catch { /* player may reject a seek during reload */ }
+        if (savedVolume != null && savedVolume < 0.95 && media.volume > 0.95) {
+          try { media.volume = savedVolume; } catch { /* ignore */ }
+        }
+        trace('playback_restored', { videoId, savedTime: anchor, restores });
+        if (restores >= 2) finish();
+      };
+      document.addEventListener('pause', onPause, true);
+      document.addEventListener('timeupdate', onMedia, true);
+      document.addEventListener('loadeddata', onMedia, true);
+      document.addEventListener('play', onMedia, true);
+    };
+
     const onRequestTrack = (event: Event) => {
       const detail = (event as CustomEvent)?.detail || {};
       const currentVideoId = new URL(location.href).searchParams.get('v') || '';
       if (!currentVideoId) return;
 
       trace('track_requested', { videoId: currentVideoId, language: detail.languageCode });
-      // If already cached, dispatch immediately
       const cached = g.__vesta_caption_cache[`${currentVideoId}:source:${detail.languageCode}`] || g.__vesta_caption_cache[currentVideoId];
-      if (cached && cached.text && (!detail.languageCode || cached.languageCode === detail.languageCode)) {
-        window.dispatchEvent(
-          new CustomEvent('vesta-caption-payload', {
-            detail: cached,
-          })
-        );
+      const cacheHit = Boolean(cached && cached.text && (!detail.languageCode || cached.languageCode === detail.languageCode));
+      const activationKey = `${currentVideoId}:${detail.languageCode || ''}`;
+      if (activatedFor !== activationKey) {
+        activatedFor = activationKey;
+        activationAttempts = 0;
+        lastActivationAt = 0;
+      }
+      const decision = captionActivationDecision({
+        cached: cacheHit,
+        enabled: mainWorldHooks().activatePlayerCaptions,
+        hidden: document.visibilityState === 'hidden',
+        attempts: activationAttempts,
+        elapsedSinceAttemptMs: activationAttempts > 0 ? performance.now() - lastActivationAt : null,
+      });
+      if (decision === 'use-cache') {
+        deferredTrack = null;
+        if (retryTimer != null) { window.clearTimeout(retryTimer); retryTimer = null; }
+        window.dispatchEvent(new CustomEvent('vesta-caption-payload', { detail: cached }));
+        return;
+      }
+      if (decision === 'skip-disabled' || decision === 'skip-duplicate') {
+        if (decision === 'skip-duplicate') trace('activation_skipped', { videoId: currentVideoId, reason: 'already_requested' });
+        return;
+      }
+      if (decision === 'defer-hidden') {
+        deferredTrack = { videoId: currentVideoId, languageCode: detail.languageCode };
+        trace('activation_deferred', { videoId: currentVideoId, reason: 'hidden' });
         return;
       }
 
-      // If not yet fetched by player, trigger native player subtitle request.
-      // Re-read the flag so a stored switch takes effect on the next request after reload.
-      if (!mainWorldHooks().activatePlayerCaptions) return;
+      activationAttempts += 1;
+      lastActivationAt = performance.now();
+      deferredTrack = null;
+      const media = (document.querySelector('video.html5-main-video') || document.querySelector('video')) as HTMLVideoElement | null;
+      const savedTime = media && Number.isFinite(media.currentTime) ? media.currentTime : 0;
+      const savedVolume = media && Number.isFinite(media.volume) ? media.volume : null;
+      if (activationAttempts === 1) armPlaybackRestore(currentVideoId, savedTime, savedVolume);
+      const languageCode = detail.languageCode;
+      const videoId = currentVideoId;
+      // A bare {languageCode} track reloads the media element. The track object
+      // already in the player selects the same captions without that reload.
+      const applyTrack = () => {
+        if (document.visibilityState === 'hidden') {
+          deferredTrack = { videoId, languageCode };
+          trace('activation_deferred', { videoId, reason: 'hidden' });
+          return true;
+        }
+        if (new URL(location.href).searchParams.get('v') !== videoId) return true;
+        const cachedNow = g.__vesta_caption_cache[`${videoId}:source:${languageCode}`] || g.__vesta_caption_cache[videoId];
+        if (cachedNow?.text && (!languageCode || cachedNow.languageCode === languageCode)) {
+          window.dispatchEvent(new CustomEvent('vesta-caption-payload', { detail: cachedNow }));
+          return true;
+        }
+        const player = (document.getElementById('movie_player') || document.querySelector('.html5-video-player')) as any;
+        if (!player || typeof player.setOption !== 'function') return false;
+        let list: any[] = [];
+        try {
+          list = player.getOption?.('captions', 'tracklist', { includeAsr: true }) || player.getOption?.('captions', 'tracklist') || [];
+        } catch { list = []; }
+        const chosen = Array.isArray(list) ? list.find((track) => track?.languageCode === languageCode) : null;
+        if (!chosen) return false;
+        player.setOption('captions', 'track', chosen);
+        trace('activation_track', { videoId, language: languageCode, kind: chosen.kind || null });
+        return true;
+      };
       try {
-        const player = (document.getElementById('movie_player') || (document.querySelector('.html5-video-player') as any)) as any;
-        if (player) {
-          if (typeof player.loadModule === 'function') {
-            player.loadModule('captions');
-          }
-          if (typeof player.setOption === 'function' && detail.languageCode) {
-            player.setOption('captions', 'track', { languageCode: detail.languageCode });
-          }
-
+        const player = (document.getElementById('movie_player') || document.querySelector('.html5-video-player')) as any;
+        if (typeof player?.loadModule === 'function') player.loadModule('captions');
+        if (retryTimer == null) {
+          retryTimer = window.setTimeout(() => {
+            retryTimer = null;
+            if (!applyTrack()) {
+              retryTimer = window.setTimeout(() => { retryTimer = null; applyTrack(); }, 2000);
+            }
+          }, 1000);
         }
       } catch (err) {
+        activationAttempts = Math.max(0, activationAttempts - 1);
         console.warn('[VestaBridge] Player trigger failed:', err);
       }
     };
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible' || !deferredTrack) return;
+      const pending = deferredTrack;
+      deferredTrack = null;
+      if (new URL(location.href).searchParams.get('v') !== pending.videoId) return;
+      onRequestTrack(new CustomEvent('vesta-request-track', { detail: pending }));
+    });
 
     window.addEventListener('vesta-request-track', onRequestTrack);
 
@@ -211,7 +323,18 @@ export default defineContentScript({
 
 
     // 4. Lifecycle cleanup on SPA navigation
+    const releaseActivationForOtherVideo = () => {
+      const currentVideoId = new URL(location.href).searchParams.get('v') || '';
+      if (activatedFor && !activatedFor.startsWith(`${currentVideoId}:`)) {
+        activatedFor = null;
+        activationAttempts = 0;
+        lastActivationAt = 0;
+        if (retryTimer != null) { window.clearTimeout(retryTimer); retryTimer = null; }
+      }
+      if (deferredTrack && deferredTrack.videoId !== currentVideoId) deferredTrack = null;
+    };
     const onNavStart = () => {
+      releaseActivationForOtherVideo();
       const currentVideoId = new URL(location.href).searchParams.get('v') || '';
       trace('navigation_started');
       for (const k of Object.keys(g.__vesta_caption_cache || {})) {
@@ -221,12 +344,14 @@ export default defineContentScript({
       }
     };
     window.addEventListener('yt-navigate-start', onNavStart);
+    window.addEventListener('yt-navigate-finish', releaseActivationForOtherVideo);
 
     window.addEventListener('pagehide', event => {
       if(event.persisted)return; // Retain passive listeners for a BFCache restoration.
       window.removeEventListener('vesta-request-track', onRequestTrack);
       window.removeEventListener('vesta-request-tracks', onRequestTracks);
       window.removeEventListener('yt-navigate-start', onNavStart);
+      window.removeEventListener('yt-navigate-finish', releaseActivationForOtherVideo);
     });
   },
 });

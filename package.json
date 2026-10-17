@@ -1,6 +1,6 @@
 {
   "name": "vesta-dub",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "YouTube videolarını Türkçe dinle. Altyazılardan seslendirme, iki Türkçe ses ve videoya uyum sağlayan konuşma hızı.",
   "type": "module",
   "private": true,

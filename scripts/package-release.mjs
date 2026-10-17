@@ -11,7 +11,7 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, '.output/chrome-mv3');
 const releaseDir = path.join(root, 'release');
-const zipPath = path.join(releaseDir, 'vesta-dub-0.1.0-rc.zip');
+const zipPath = path.join(releaseDir, 'vesta-dub-0.1.1-rc.zip');
 
 const sync = spawnSync('node', ['scripts/sync-bergamot.mjs'], { cwd: root, stdio: 'inherit' });
 if (sync.status !== 0) process.exit(sync.status ?? 1);
@@ -96,8 +96,8 @@ for (const file of walk(output)) {
 }
 
 const manifest = JSON.parse(fs.readFileSync(path.join(output, 'manifest.json'), 'utf8'));
-if (manifest.version !== '0.1.0' || manifest.manifest_version !== 3) {
-  console.error('Manifest version is not the 0.1.0 MV3 candidate.');
+if (manifest.version !== '0.1.1' || manifest.manifest_version !== 3) {
+  console.error('Manifest version is not the 0.1.1 MV3 candidate.');
   process.exit(1);
 }
 const hosts = manifest.host_permissions ?? [];
@@ -152,10 +152,10 @@ if (unpackedList !== packedList) {
 
 const zipHash = crypto.createHash('sha256').update(fs.readFileSync(zipPath)).digest('hex');
 const zipSize = fs.statSync(zipPath).size;
-fs.writeFileSync(path.join(releaseDir, 'vesta-dub-0.1.0-rc.sha256'), `${zipHash}  vesta-dub-0.1.0-rc.zip\n`);
-const publicZip = path.join(releaseDir, 'vesta-dub-0.1.0.zip');
+fs.writeFileSync(path.join(releaseDir, 'vesta-dub-0.1.1-rc.sha256'), `${zipHash}  vesta-dub-0.1.1-rc.zip\n`);
+const publicZip = path.join(releaseDir, 'vesta-dub-0.1.1.zip');
 fs.copyFileSync(zipPath, publicZip);
-fs.writeFileSync(path.join(releaseDir, 'vesta-dub-0.1.0.sha256'), `${zipHash}  vesta-dub-0.1.0.zip\n`);
+fs.writeFileSync(path.join(releaseDir, 'vesta-dub-0.1.1.sha256'), `${zipHash}  vesta-dub-0.1.1.zip\n`);
 fs.writeFileSync(path.join(releaseDir, 'manifest.txt'), `${unpackedList}\n`);
 
 const modelBytes = unpacked.filter(item => item.relative.startsWith('models/')).reduce((sum, item) => sum + item.size, 0);
@@ -164,7 +164,7 @@ console.log(JSON.stringify({
   files: unpacked.length,
   zipBytes: zipSize,
   zipSha256: zipHash,
-  publicZip: 'vesta-dub-0.1.0.zip',
+  publicZip: 'vesta-dub-0.1.1.zip',
   modelBytes,
   hostPermissions: hosts,
   unpackedMatchesZip: true,

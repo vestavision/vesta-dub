@@ -17,6 +17,11 @@ export interface LexiconEntry {
   matchMode: 'exact_word' | 'word_boundary' | 'suffix_aware';
   /** Notes on pronunciation or ambiguity */
   notes?: string;
+  /**
+   * Listening candidates are excluded from playback until a person prefers them.
+   * Omitted status means the entry is already on the production path.
+   */
+  status?: 'production' | 'listening-candidate';
 }
 
 export const PRONUNCIATION_LEXICON: LexiconEntry[] = [
@@ -548,5 +553,33 @@ export const PRONUNCIATION_LEXICON: LexiconEntry[] = [
     category: 'brand',
     caseSensitive: false,
     matchMode: 'word_boundary',
+  },
+
+  // Product phrases. Longest match only. A bare "Y" is not an entry.
+  // The 2026-10-17 listening review preferred "Ye" over "Vay" and over the written letter.
+  {
+    canonical: 'Tesla Model Y',
+    spoken: 'Tesla Model Ye',
+    category: 'model',
+    caseSensitive: false,
+    matchMode: 'suffix_aware',
+    notes: 'Listened preference for this vehicle name. Does not apply to other words that contain Y, and does not rewrite Model S, Model X, or Model 3.',
+  },
+  {
+    canonical: 'Tesla Model S',
+    spoken: 'Tesla Model Es',
+    category: 'model',
+    caseSensitive: false,
+    matchMode: 'suffix_aware',
+    status: 'listening-candidate',
+    notes: 'Candidate so a later letter rule cannot retouch the variant after Model Y is replaced.',
+  },
+  {
+    canonical: 'Tesla Model X',
+    spoken: 'Tesla Model Eks',
+    category: 'model',
+    caseSensitive: false,
+    matchMode: 'suffix_aware',
+    status: 'listening-candidate',
   },
 ];

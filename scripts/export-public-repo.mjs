@@ -131,13 +131,13 @@ function walk(directory) {
 }
 walk(dest);
 
-const zipSource = path.join(source, 'release/vesta-dub-0.1.0.zip');
-const zipDest = path.join(dest, 'release/vesta-dub-0.1.0.zip');
+const zipSource = path.join(source, 'release/vesta-dub-0.1.1.zip');
+const zipDest = path.join(dest, 'release/vesta-dub-0.1.1.zip');
 if (fs.existsSync(zipSource)) {
   fs.mkdirSync(path.join(dest, 'release'), { recursive: true });
   fs.copyFileSync(zipSource, zipDest);
-  const sum = path.join(source, 'release/vesta-dub-0.1.0.sha256');
-  if (fs.existsSync(sum)) fs.copyFileSync(sum, path.join(dest, 'release/vesta-dub-0.1.0.sha256'));
+  const sum = path.join(source, 'release/vesta-dub-0.1.1.sha256');
+  if (fs.existsSync(sum)) fs.copyFileSync(sum, path.join(dest, 'release/vesta-dub-0.1.1.sha256'));
   const listing = spawnSync('unzip', ['-Z1', zipDest], { encoding: 'utf8' });
   if (listing.status !== 0) hits.push('could not list the release zip');
   for (const line of listing.stdout.split('\n')) {

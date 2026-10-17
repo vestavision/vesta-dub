@@ -591,6 +591,9 @@ export default defineContentScript({
       }
       state.settings.enabled=activation.snapshot().activeVideoId!==null;
       const video=id ? document.querySelector('video') as HTMLVideoElement|null : null;
+      // Caption activation detaches the media element for a moment. A missing
+      // element on the same watch URL is not a navigation.
+      if(!changed && id && !video && lastElement) return;
       if(id&&video&&video.readyState>=1&&playerVideoId===id)activation.confirmVideo(id);
       const run=Boolean(state.settings.enabled&&video&&video.readyState>=1&&playerVideoId===id);
       if(changed||video!==lastElement||run!==pipelineRunning){

@@ -1,19 +1,19 @@
 #!/bin/sh
-# Prepare Vesta Dub 0.1.0 for Chrome or Brave.
+# Prepare Vesta Dub 0.1.1 for Chrome or Brave.
 # This script verifies a pinned release zip and extracts it into a user-owned
 # directory. It does not install the extension into the browser, change browser
 # policy, or request administrator rights.
 set -eu
 
-VERSION="0.1.0"
-EXPECTED_ZIP_SHA256="eb9b06430c475ee5dc8d9ec77b0135b56d155341c4157ac54dee6993139f237a"
+VERSION="0.1.1"
+EXPECTED_ZIP_SHA256="4ecb385cd9ec853060641a1037a99a9ba1351b9ec733a4f98c01d5d8e5e0ac44"
 # Git object ids of the withdrawn Piper files (SHA-1 of "blob <size>\\0" + bytes).
 # These are not SHA-256 digests. SHA-256 of an extracted file cannot match them.
 PIPER_GIT_BLOB="034599b1241214da842ec5f02a7265bb242efcac"
 PIPER_CONFIG_GIT_BLOB="b495964d27195aae03726391b35a6ab1a513859f"
-OFFICIAL_BASE="https://github.com/vestavision/vesta-dub/releases/download/v0.1.0"
-ZIP_NAME="vesta-dub-0.1.0.zip"
-SUM_NAME="vesta-dub-0.1.0.sha256"
+OFFICIAL_BASE="https://github.com/vestavision/vesta-dub/releases/download/v0.1.1"
+ZIP_NAME="vesta-dub-0.1.1.zip"
+SUM_NAME="vesta-dub-0.1.1.sha256"
 
 browser="auto"
 dry=0
@@ -420,7 +420,7 @@ extra_git = os.environ.get("VESTA_FORBIDDEN_GIT", "")
 if extra_git:
     forbidden_git.add(extra_git)
 
-# 0.1.0 declares 75 entries and 192,176,618 unpacked bytes (voice models
+# 0.1.1 declares 75 entries and 192,189,414 unpacked bytes (voice models
 # plus several ONNX Runtime wasm builds). The cap stays above that release
 # and still rejects a much larger archive.
 max_files = 400
@@ -499,8 +499,8 @@ if not manifest.is_file() or manifest.is_symlink():
 text = manifest.read_text(encoding="utf-8")
 if '"manifest_version"' not in text or '"version"' not in text:
     fail("manifest.json is not a Chrome manifest")
-if '"version": "0.1.0"' not in text and '"version":"0.1.0"' not in text:
-    fail("manifest version is not 0.1.0")
+if '"version": "0.1.1"' not in text and '"version":"0.1.1"' not in text:
+    fail("manifest version is not 0.1.1")
 PY
 
 if [ ! -f "$staging/manifest.json" ]; then

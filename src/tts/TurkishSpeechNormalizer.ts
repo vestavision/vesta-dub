@@ -7,6 +7,14 @@ export interface NormalizationResult {
   spokenText: string;
 }
 
+export interface NormalizeOptions {
+  /**
+   * `candidate` also applies listening-candidate lexicon entries.
+   * Playback uses `production` until a human review promotes a candidate.
+   */
+  profile?: 'production' | 'candidate';
+}
+
 const ONES: Record<number, string> = {
   0: 'sıfır',
   1: 'bir',
@@ -124,13 +132,15 @@ export class TurkishSpeechNormalizer {
   /**
    * Main entrypoint: Takes display text and returns { displayText, spokenText }
    */
-  static normalize(text: string): NormalizationResult {
+  static normalize(text: string, options?: NormalizeOptions): NormalizationResult {
     const trimmed = text.trim();
     if (!trimmed) {
       return { displayText: '', spokenText: '' };
     }
 
     let spoken = trimmed;
+    // Bergamot sometimes emits a dialogue dash. It is not a spoken word.
+    spoken = spoken.replace(/^\s*[-–—•]\s+(?=\p{L})/u, '');
 
     // 1. Protect special literals: URLs, emails, code blocks from destruction
     const placeholders: Map<string, string> = new Map();
@@ -234,7 +244,10 @@ export class TurkishSpeechNormalizer {
 
     // 8. Pronunciation Lexicon replacement (boundary aware, suffix aware).
     // Longer phrases win, so "Meta AI" and "OpenAI" are not rewritten as a bare "AI".
-    const lexicon = [...PRONUNCIATION_LEXICON].sort((a, b) => b.canonical.length - a.canonical.length);
+    const profile = options?.profile ?? 'production';
+    const lexicon = PRONUNCIATION_LEXICON
+      .filter(entry => profile === 'candidate' || entry.status !== 'listening-candidate')
+      .sort((a, b) => b.canonical.length - a.canonical.length);
     for (const entry of lexicon) {
       const flags = entry.caseSensitive ? 'g' : 'gi';
       const escaped = entry.canonical.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

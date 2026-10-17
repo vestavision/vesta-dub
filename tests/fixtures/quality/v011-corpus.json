@@ -1,0 +1,212 @@
+{
+  "schema": "vesta.quality-corpus.v0.1.1",
+  "note": "Authentic rows are copied from retained caption artifacts already in this repository. Constructed rows are tests, not transcript evidence.",
+  "cases": [
+    {
+      "id": "zjk-json3-2",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 4.24,
+      "endTime": 8.48,
+      "sourceText": "just kind of like an intro talk um",
+      "note": "Incomplete livestream fragment ending in a hesitation."
+    },
+    {
+      "id": "zjk-json3-5",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 10.08,
+      "endTime": 13.679,
+      "sourceText": "talk and they told me that uh they",
+      "note": "Interior uh inside an unfinished clause."
+    },
+    {
+      "id": "zjk-json3-13",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 26.56,
+      "endTime": 31.279,
+      "sourceText": "language model is just two files right",
+      "note": "Trailing right is a confirmation tag, not a direction."
+    },
+    {
+      "id": "zjk-json3-14",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 29.56,
+      "endTime": 33.16,
+      "sourceText": "um there will be two files in this",
+      "note": "Leading hesitation on an incomplete technical cue."
+    },
+    {
+      "id": "byx-standard-10",
+      "origin": "authentic",
+      "videoId": "byx",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 291.6,
+      "endTime": 298.56,
+      "sourceText": "Yeah. All of the United States currently uses only half a terawatt on average.",
+      "note": "Yeah opens a factual sentence. It is an acknowledgement, not a hesitation."
+    },
+    {
+      "id": "byx-standard-15",
+      "origin": "authentic",
+      "videoId": "byx",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 324.16,
+      "endTime": 326.64,
+      "sourceText": "It's actually very difficult to build power plants.",
+      "note": "actually is a meaning-bearing adverb."
+    },
+    {
+      "id": "zjk-stable-0",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p7/real-caption-regression.json",
+      "startTime": 216.643,
+      "endTime": 220.895,
+      "sourceText": "terms of the speed of this uh video here this was not running a 70 billion",
+      "note": "Interior uh in a technical livestream phrase."
+    },
+    {
+      "id": "zjk-stable-12",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "sourceText": "on your MacBook model training is a competition very involved process process so basically what we're",
+      "note": "Product name inside a repeated, unpunctuated training description."
+    },
+    {
+      "id": "zjk-live-10",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 512.805,
+      "endTime": 521.805,
+      "sourceText": "the next word in a sequence well in this case I'm highlighting here in red some of the words that would contain a lot of",
+      "note": "Mid-sentence well. Ambiguous, so the translator's reading is preserved."
+    },
+    {
+      "id": "zjk-live-16",
+      "origin": "authentic",
+      "videoId": "zjkBMFhNj_g",
+      "sourceFile": "tests/artifacts/p8.1/corpus.json",
+      "startTime": 545.623,
+      "endTime": 549.943,
+      "sourceText": "networks well once we've trained them I showed you that the model",
+      "note": "well is not the first token. It is not rewritten as a noun."
+    },
+    {
+      "id": "constructed-yeah-agree",
+      "origin": "constructed",
+      "sourceText": "Yeah, I agree.",
+      "note": "Affirmation plus agreement. Not evidence from a transcript."
+    },
+    {
+      "id": "constructed-yeah-question",
+      "origin": "constructed",
+      "sourceText": "Yeah?",
+      "note": "Question function of yeah."
+    },
+    {
+      "id": "constructed-yes",
+      "origin": "constructed",
+      "sourceText": "Yes.",
+      "note": "Short acknowledgement."
+    },
+    {
+      "id": "constructed-yep",
+      "origin": "constructed",
+      "sourceText": "Yep.",
+      "note": "Short acknowledgement."
+    },
+    {
+      "id": "constructed-uh-huh",
+      "origin": "constructed",
+      "sourceText": "Uh-huh.",
+      "note": "Backchannel."
+    },
+    {
+      "id": "constructed-mm-hmm",
+      "origin": "constructed",
+      "sourceText": "Mm-hmm.",
+      "note": "Backchannel."
+    },
+    {
+      "id": "constructed-well",
+      "origin": "constructed",
+      "sourceText": "Well, that's complicated.",
+      "note": "Discourse opener, not the noun well."
+    },
+    {
+      "id": "constructed-um",
+      "origin": "constructed",
+      "sourceText": "Um, I need a minute.",
+      "note": "Leading hesitation with propositional content."
+    },
+    {
+      "id": "constructed-uh",
+      "origin": "constructed",
+      "sourceText": "Uh, I don't know.",
+      "note": "Leading hesitation."
+    },
+    {
+      "id": "constructed-hmm",
+      "origin": "constructed",
+      "sourceText": "Hmm.",
+      "note": "Thinking sound. Not an ah substitution."
+    },
+    {
+      "id": "constructed-oh",
+      "origin": "constructed",
+      "sourceText": "Oh, now I understand.",
+      "note": "Realization."
+    },
+    {
+      "id": "constructed-ah",
+      "origin": "constructed",
+      "sourceText": "Ah, I see.",
+      "note": "Realization. Illustrative, not a universal sentence template."
+    },
+    {
+      "id": "constructed-right",
+      "origin": "constructed",
+      "sourceText": "Right, let's continue.",
+      "note": "Agreement opener."
+    },
+    {
+      "id": "constructed-sure",
+      "origin": "constructed",
+      "sourceText": "Sure.",
+      "note": "Agreement."
+    },
+    {
+      "id": "constructed-actually",
+      "origin": "constructed",
+      "sourceText": "Actually, the model is smaller.",
+      "note": "Adverb with meaning."
+    },
+    {
+      "id": "constructed-yeah-no",
+      "origin": "constructed",
+      "sourceText": "Yeah, no.",
+      "note": "Not a plain affirmation."
+    },
+    {
+      "id": "constructed-tesla",
+      "origin": "constructed",
+      "sourceText": "Tesla Model Y uses a new battery.",
+      "note": "Product name. Not present in the retained caption sample."
+    },
+    {
+      "id": "constructed-technical",
+      "origin": "constructed",
+      "sourceText": "The RTX 5090 runs the LLM in ChatGPT from OpenAI on a MacBook.",
+      "note": "Technical names and a model number."
+    }
+  ]
+}

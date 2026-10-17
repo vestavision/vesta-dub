@@ -14,7 +14,7 @@ Describe the version, the commit, and the smallest steps that show the problem. 
 
 ## Supported use
 
-The security boundary for 0.1.0 is the unpacked extension prepared from the versioned release zip, which is the same tree built by `npm run package:release`. `install.sh` only downloads and checks that zip. It does not change browser policy. Research scripts under `scripts/`, `tools/`, and `tests/` are not a supported production surface.
+The security boundary for 0.1.1 is the unpacked extension prepared from the versioned release zip, which is the same tree built by `npm run package:release`. `install.sh` only downloads and checks that zip. It does not change browser policy. Research scripts under `scripts/`, `tools/`, and `tests/` are not a supported production surface.
 
 ## Known boundaries
 

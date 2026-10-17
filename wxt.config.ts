@@ -13,7 +13,7 @@ export default defineConfig({
   manifest: {
     name: 'Vesta Dub',
     short_name: 'Vesta Dub',
-    version: '0.1.0',
+    version: '0.1.1',
     description: 'YouTube videolarını Türkçe dinle. Altyazılardan seslendirme, iki Türkçe ses ve videoya uyum sağlayan konuşma hızı.',
     icons: {
       16: 'icons/icon-16.png',
